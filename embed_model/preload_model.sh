@@ -1,22 +1,23 @@
 #!/bin/bash
 
-# Start the Ollama server in the background
+# Start the Ollama server in the background for preloading.
 echo "Starting Ollama server to preload models: $MODEL_NAMES"
 ollama serve &
 
-# Capture the PID of the Ollama server
+# Capture the PID of the Ollama server.
 OLLAMA_PID=$!
 
-# Wait for the server to be ready (adjust if necessary)
+# Wait for the server to be ready.
 echo "Waiting for Ollama server to start..."
 sleep 5
 
-# Split the comma-separated model names into an array
+# Split the comma-separated model names into an array.
 IFS=',' read -r -a MODELS <<< "$MODEL_NAMES"
 
-# Loop through each model and pull it
+# Loop through each model and pull it.
 for MODEL_NAME in "${MODELS[@]}"; do
   echo "Pulling model: $MODEL_NAME"
+  # This 'ollama pull' command relies on $MODEL_NAME being in the 'hf.co/repo[:tag]' format.
   if ollama pull "$MODEL_NAME"; then
     echo "Successfully pulled model: $MODEL_NAME"
   else
@@ -26,11 +27,11 @@ for MODEL_NAME in "${MODELS[@]}"; do
   fi
 done
 
-# Stop the Ollama server
+# Stop the Ollama server after preloading.
 echo "Stopping Ollama server..."
 kill $OLLAMA_PID
 
-# Wait for the server to terminate
+# Wait for the server to terminate.
 wait $OLLAMA_PID
 
 echo "Model preloading complete."
